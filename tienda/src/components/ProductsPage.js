@@ -1,32 +1,22 @@
-import React, { useState } from 'react';
-import AdminProductsPage from './AdminProductsPage';
+import React, { useState, useEffect } from 'react';
+import { getProducts } from '../utils/db.js'; // Asumiendo que `db.js` contiene las funciones de IndexedDB
+import AdminProductsPage from './AdminProductsPage'; // Importar el componente AdminProductsPage
 import './ProductsPage.css';
 
 const ProductsPage = ({ user, onLogout }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [cartItems, setCartItems] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [view, setView] = useState('products'); // Vista actual: 'products' o 'admin-products'
-  const [products] = useState([
-    {
-      id: 1,
-      name: 'Producto 1',
-      price: 20,
-      description: 'Descripción del producto 1',
-      author: 'Admin1',
-      dateCreated: '2024-12-02',
-      category: 'Electrónica',
-    },
-    {
-      id: 2,
-      name: 'Producto 2',
-      price: 50,
-      description: 'Descripción del producto 2',
-      author: 'Admin2',
-      dateCreated: '2024-12-01',
-      category: 'Hogar',
-    },
-  ]);
+  const [view, setView] = useState('products'); // Estado para controlar la vista
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const dbProducts = await getProducts();
+      setProducts(dbProducts);
+    };
+    fetchProducts();
+  }, []);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -40,12 +30,7 @@ const ProductsPage = ({ user, onLogout }) => {
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Cambia a la vista de administración de productos
-  const handleAdminProducts = () => {
-    setView('admin-products');
-  };
-
-  return view === 'products' ? (
+  return view === 'products' ? ( // Renderiza según el valor de 'view'
     <div className="products-page">
       <header className="navbar">
         <div className="logo">Tienda</div>
@@ -66,7 +51,7 @@ const ProductsPage = ({ user, onLogout }) => {
           {isMenuOpen && (
             <div className="dropdown-menu">
               {user?.role === 'admin' && (
-                <button onClick={handleAdminProducts}>Productos</button>
+                <button onClick={() => setView('admin-products')}>Productos</button>
               )}
               <button onClick={onLogout}>Cerrar sesión</button>
             </div>
@@ -79,12 +64,14 @@ const ProductsPage = ({ user, onLogout }) => {
       <main className="product-list">
         {filteredProducts.map((product) => (
           <div key={product.id} className="product-card">
+            <img
+              src={product.image || '../public/default-placeholder.png'} // Ruta predeterminada si no hay imagen
+              alt={product.name}
+              className="product-image"
+              onError={(e) => { e.target.src = '/default-placeholder.png'; }}
+            />
             <h3>{product.name}</h3>
-            <p>{product.description}</p>
             <p>Precio: ${product.price}</p>
-            <p>Categoría: {product.category}</p>
-            <p>Creado por: {product.author}</p>
-            <p>Fecha: {product.dateCreated}</p>
             <button onClick={() => addToCart(product)}>Agregar al carrito</button>
           </div>
         ))}
@@ -93,7 +80,7 @@ const ProductsPage = ({ user, onLogout }) => {
   ) : (
     <AdminProductsPage
       user={user}
-      onBack={() => setView('products')} // Vuelve a la vista principal
+      onBack={() => setView('products')} // Cambia la vista de vuelta a 'products'
     />
   );
 };
