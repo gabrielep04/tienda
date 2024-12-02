@@ -1,0 +1,113 @@
+.register-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.9); 
+    transition: background-color 0.3s ease;
+  }
+  
+  .register-form {
+    background-color: #ffffff; 
+    padding: 30px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+    width: 350px; 
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  /* Estilos de los inputs */
+  .register-form input {
+    width: 320px; 
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #f7f7f7;
+    color: #333;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  
+  .register-form input:focus {
+    border-color: #005bb5; 
+    background-color: #fff;
+    outline: none;
+  }
+  
+  /* Estilos de los botones */
+  .register-form button {
+    width: 100%;
+    padding: 12px;
+    background-color: #005bb5; 
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px; 
+  }
+  
+  /* Espacio adicional entre los botones */
+  .register-form button + button {
+    margin-top: 15px; 
+  }
+  
+  .register-form button:hover {
+    background-color: #004494; 
+  }
+  
+  /* Mensajes de error */
+  .error-message {
+    color: #d32f2f; 
+    font-size: 18px; 
+    margin-top: 20px; 
+    margin-bottom: 20px; 
+    text-align: center; 
+    font-weight: bold; 
+  }
+  
+  /* Modo oscuro */
+  .dark .register-form-container {
+    background-color: rgba(34, 34, 34, 0.9); 
+  }
+  
+  .dark .register-form {
+    background-color: #333; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+    color: #eee;
+  }
+  
+  .dark .register-form input {
+    background-color: #555; 
+    color: #eee; 
+    border: 1px solid #666; 
+  }
+  
+  .dark .register-form input:focus {
+    border-color: #80d8ff; 
+  }
+  
+  .dark .register-form button {
+    background-color: #80d8ff; 
+    color: #333; 
+  }
+  
+  .dark .register-form button:hover {
+    background-color: #4ec8ff; 
+  }
+  
+  .dark .error-message {
+    color: #ff5c5c; 
+    font-size: 18px; 
+    font-weight: bold; 
+    margin-top: 20px; 
+    margin-bottom: 20px; 
+    text-align: center; 
+  }
+  

@@ -1,0 +1,115 @@
+.admin-products-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.admin-products-page header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #005bb5;
+    color: white;
+}
+
+.admin-products-page header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.admin-products-page header button {
+    background-color: white;
+    color: #005bb5;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.admin-products-page header button:hover {
+    background-color: #f0f0f0;
+}
+
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.product-card {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.product-card h3 {
+    margin: 10px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.product-card p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.product-card button {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #005bb5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.product-card button:hover {
+    background-color: #004494;
+}
+
+.product-card .edit-button {
+    background-color: #ffa500;
+    margin-right: 10px;
+}
+
+.product-card .edit-button:hover {
+    background-color: #cc8400;
+}
+
+.product-card .delete-button {
+    background-color: #d9534f;
+}
+
+.product-card .delete-button:hover {
+    background-color: #c9302c;
+}
+
+.add-product-button {
+    align-self: flex-start;
+    margin: 20px;
+    padding: 10px 20px;
+    background-color: #005bb5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-product-button:hover {
+    background-color: #004494;
+}
