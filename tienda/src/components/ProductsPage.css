@@ -90,11 +90,11 @@ products-page {
 
   .filters-section {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 15px;
     border-radius: 8px;
     margin: 20px 0;
-    align-items: center;
+    margin-left: 10px;
   }
   
   .filter-input {
