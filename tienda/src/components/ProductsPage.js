@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getProducts } from '../utils/db.js'; // Asumiendo que `db.js` contiene las funciones de IndexedDB
-import AdminProductsPage from './AdminProductsPage'; // Importar el componente AdminProductsPage
+import { getProducts } from '../utils/db.js'; 
+import AdminProductsPage from './AdminProductsPage'; 
 import './ProductsPage.css';
 
 const ProductsPage = ({ user, onLogout }) => {
@@ -9,6 +9,11 @@ const ProductsPage = ({ user, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [view, setView] = useState('products'); // Estado para controlar la vista
   const [products, setProducts] = useState([]);
+
+  // Estados para los filtros
+  const [category, setCategory] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -26,21 +31,63 @@ const ProductsPage = ({ user, onLogout }) => {
     setCartItems([...cartItems, product]);
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Lógica de filtrado
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = category ? product.category === category : true;
+    const matchesMinPrice = minPrice ? product.price >= parseFloat(minPrice) : true;
+    const matchesMaxPrice = maxPrice ? product.price <= parseFloat(maxPrice) : true;
+    return (
+      matchesSearch &&
+      matchesCategory &&
+      matchesMinPrice &&
+      matchesMaxPrice
+    );
+  });
 
   return view === 'products' ? ( // Renderiza según el valor de 'view'
     <div className="products-page">
       <header className="navbar">
-        <div className="logo">Tienda</div>
-        <input
-          type="text"
-          className="search-bar"
-          placeholder="Buscar productos..."
-          value={searchTerm}
-          onChange={handleSearch}
-        />
+        <h1 className="logo">Shopsmart</h1>
+
+      {/* Controles de filtros */}
+        <div className="filters-section">
+          <input
+            type="text"
+            className="filter-input search-bar"
+            placeholder="🔍 Buscar productos..."
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+          <select
+            className="filter-select"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="">Todas las categorías</option>
+            {[...new Set(products.map((p) => p.category))].map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+          <div className="price-filters">
+            <input
+              type="number"
+              className="filter-input"
+              placeholder="💵 Mínimo"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+            />
+            <input
+              type="number"
+              className="filter-input"
+              placeholder="💵 Máximo"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+            />
+          </div>
+        </div>
         <div className="user-profile">
           <span
             onClick={() => setIsMenuOpen((prev) => !prev)}

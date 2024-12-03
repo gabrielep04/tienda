@@ -5,6 +5,8 @@ products-page {
 }
 
 .navbar {
+  position: sticky;
+  top: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -13,11 +15,8 @@ products-page {
     color: white;
 }
 
-.search-bar {
-    padding: 5px;
-    width: 300px;
-    border-radius: 5px;
-    border: none;
+.logo{
+  color: #FFC220;
 }
 
 .user-profile, .cart {
@@ -72,16 +71,80 @@ products-page {
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     padding: 10px;
     z-index: 1000;
+    width: 100%;
   }
   
   .dropdown-menu button {
     background: none;
     border: none;
-    color: red;
+    color: black;
     cursor: pointer;
     font-size: 14px;
+    text-align: left;
+    margin-bottom: 5px;
   }
   
   .dropdown-menu button:hover {
     text-decoration: underline;
   }
+
+  .filters-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    align-items: center;
+  }
+  
+  .filter-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+    border-color: black;
+  }
+  
+  .filter-input:focus {
+    border-color: #005bb5;
+    outline: none;
+  }
+  
+  .filter-select {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 14px;
+    background-color: #fff;
+    cursor: pointer;
+    border-color: black;
+  }
+  
+  .price-filters {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+  }
+  
+  .filters-section input::placeholder {
+    color: #999;
+    font-style: italic;
+  }
+  
+  .filters-section input,
+  .filters-section select {
+    max-width: 200px;
+  }
+  
+  .filters-section select {
+    text-align: center;
+  }
+  
+  .filters-section select:hover,
+  .filters-section input:hover {
+    border-color: #0073e6;
+  }
+  

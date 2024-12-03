@@ -13,6 +13,10 @@
     color: white;
 }
 
+.title-gestor{
+    color: #FFC220;
+}
+
 .admin-products-page header h1 {
     margin: 0;
     font-size: 24px;
@@ -183,5 +187,44 @@
 }
 
 .price-range input {
-    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    color: #555;
+    appearance: none; /* Para ocultar el estilo predeterminado del navegador */
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23555" d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+}
+
+.filter-group select:hover {
+    border-color: #005bb5;
+    box-shadow: 0 0 8px rgba(0, 91, 181, 0.2);
+}
+
+.filter-group select:focus {
+    border-color: #004494;
+    box-shadow: 0 0 10px rgba(0, 68, 148, 0.3);
+    color: #333;
+}
+
+.filter-group select option {
+    padding: 10px;
+    background-color: #fff;
+    color: #555;
+    font-size: 14px;
+}
+
+.eliminar-button {
+    margin-left: 5px;
 }
