@@ -133,6 +133,13 @@ const AdminProductsPage = ({ onBack, user }) => {
     setProducts(updatedProducts);
   };
 
+  const truncateDescription = (description) => {
+    if (description.length > 30) {
+      return description.substring(0, 25) + "...";
+    }
+    return description;
+  };
+
   return (
     <div className="admin-products-page">
       <header>
@@ -204,7 +211,7 @@ const AdminProductsPage = ({ onBack, user }) => {
 
       <div className="product-list">
         {filteredProducts.map((product) => (
-          <div key={product.id} className="product-card">
+          <div key={product.id} className="product-card-admin">
             <img
               src={product.image || '../public/default-placeholder.png'}
               alt={product.name}
@@ -213,7 +220,7 @@ const AdminProductsPage = ({ onBack, user }) => {
               }}
             />
             <h3>{product.name}</h3>
-            <p>{product.description}</p>
+            <p>{truncateDescription(product.description)}</p>
             <p>Precio: ${product.price}</p>
             <p>Categoría: {product.category}</p>
             <p>Cantidad: {product.quantity}</p>

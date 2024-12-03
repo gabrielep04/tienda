@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getProducts } from '../utils/db.js'; 
 import AdminProductsPage from './AdminProductsPage'; 
+import ProductPopup from './ProductPopup';
 import './ProductsPage.css';
 
 const ProductsPage = ({ user, onLogout }) => {
@@ -9,6 +10,7 @@ const ProductsPage = ({ user, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [view, setView] = useState('products'); // Estado para controlar la vista
   const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null); // Estado para el producto seleccionado
 
   // Estados para los filtros
   const [category, setCategory] = useState('');
@@ -31,7 +33,6 @@ const ProductsPage = ({ user, onLogout }) => {
     setCartItems([...cartItems, product]);
   };
 
-  // Lógica de filtrado
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = category ? product.category === category : true;
@@ -45,12 +46,12 @@ const ProductsPage = ({ user, onLogout }) => {
     );
   });
 
-  return view === 'products' ? ( // Renderiza según el valor de 'view'
+  return view === 'products' ? (
     <div className="products-page">
       <header className="navbar">
         <h1 className="logo">Shopsmart</h1>
 
-      {/* Controles de filtros */}
+        {/* Controles de filtros */}
         <div className="filters-section">
           <input
             type="text"
@@ -110,24 +111,44 @@ const ProductsPage = ({ user, onLogout }) => {
       </header>
       <main className="product-list">
         {filteredProducts.map((product) => (
-          <div key={product.id} className="product-card">
+          <div 
+            key={product.id} 
+            className="product-card" 
+            onClick={() => setSelectedProduct(product)} // Abrir popup al hacer clic
+          >
             <img
-              src={product.image || '../public/default-placeholder.png'} // Ruta predeterminada si no hay imagen
+              src={product.image || '../public/default-placeholder.png'}
               alt={product.name}
               className="product-image"
               onError={(e) => { e.target.src = '/default-placeholder.png'; }}
             />
             <h3>{product.name}</h3>
             <p>Precio: ${product.price}</p>
-            <button onClick={() => addToCart(product)}>Agregar al carrito</button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevenir la apertura del popup al hacer clic en el botón
+                addToCart(product);
+              }}
+              disabled={product.quantity === 0}
+              className={product.quantity === 0 ? 'disabled-button' : 'add-to-cart-button'}
+            >
+              {product.quantity === 0 ? 'Agotado' : 'Agregar al carrito'}
+            </button>
           </div>
         ))}
       </main>
+      {selectedProduct && (
+        <ProductPopup
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          onAddToCart={addToCart}
+        />
+      )}
     </div>
   ) : (
     <AdminProductsPage
       user={user}
-      onBack={() => setView('products')} // Cambia la vista de vuelta a 'products'
+      onBack={() => setView('products')}
     />
   );
 };

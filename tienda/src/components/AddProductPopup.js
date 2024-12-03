@@ -10,6 +10,7 @@ const AddProductPopup = ({ newProduct, setNewProduct, onSaveProduct, onClose, is
             type="text"
             placeholder="Nombre"
             value={newProduct.name}
+            maxLength={25}
             onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
           />
           <input
@@ -17,6 +18,7 @@ const AddProductPopup = ({ newProduct, setNewProduct, onSaveProduct, onClose, is
             placeholder="Precio"
             value={newProduct.price}
             min="0"
+            max="1000000"
             onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
           />
           <input
@@ -24,23 +26,27 @@ const AddProductPopup = ({ newProduct, setNewProduct, onSaveProduct, onClose, is
             placeholder="Cantidad"
             value={newProduct.quantity}
             min="1"
+            max="1000000"
             onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })}
           />
           <textarea
             placeholder="Descripción"
             value={newProduct.description}
+            maxLength={300}
             onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
           />
           <input
             type="text"
             placeholder="Proveedor"
             value={newProduct.proveedor}
+            maxLength={25}
             onChange={(e) => setNewProduct({ ...newProduct, proveedor: e.target.value })}
           />
           <input
             type="text"
             placeholder="Categoría"
             value={newProduct.category}
+            maxLength={25}
             onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
           />
           <input
