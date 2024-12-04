@@ -3,6 +3,7 @@ import { getProducts, addToCartInDB, getCartItems, updateCartItem } from '../uti
 import AdminProductsPage from './AdminProductsPage'; 
 import ProductPopup from './ProductPopup';
 import Carrito from './Carrito.js';
+import Compra from './Compra.js';
 import './ProductsPage.css';
 
 const ProductsPage = ({ user, onLogout }) => {
@@ -92,14 +93,15 @@ const ProductsPage = ({ user, onLogout }) => {
     return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice;
   });
 
-  const handleProductChange = () => {
-    // Llama a fetchProducts para actualizar los productos
-    const fetchProducts = async () => {
-      const dbProducts = await getProducts();
-      setProducts(dbProducts);
-    };
-    fetchProducts();
+  const handleProductChange = (updatedProducts) => {
+    setProducts(updatedProducts);
+  
+    // Regenerar secciones de productos
+    const shuffled = [...updatedProducts].sort(() => 0.5 - Math.random());
+    setRecommendedProducts(shuffled.slice(0, 4)); // 4 productos recomendados
+    setBestSellingProducts(shuffled.slice(4, 8)); // Otros 4 productos
   };
+  
 
 // Función para verificar si hay filtros activos
 const areFiltersActive = () => {
@@ -113,6 +115,14 @@ const areFiltersActive = () => {
 
 // Evaluar si ocultar las secciones basadas en los filtros
 const showRecommendations = !areFiltersActive();
+
+const handleCheckout = () => {
+  setView('checkout'); // Cambiar a la vista de compra
+};
+
+const handleBackToProducts = () => {
+  setView('products');
+};
 
 return view === 'products' ? (
   <div className="products-page">
@@ -290,7 +300,9 @@ return view === 'products' ? (
     )}
   </div>
 ) : view === 'cart' ? (
-  <Carrito user={user} onBack={() => setView('products')} updateCart={updateCart}/>
+  <Carrito user={user} onBack={() => setView('products')} updateCart={updateCart} updatedProducts={products} onProductChange={handleProductChange} onCheckout={handleCheckout}/>
+) : view === 'checkout' ? (
+  <Compra onBack={handleBackToProducts}/>
 ) : (
   <AdminProductsPage
     user={user}

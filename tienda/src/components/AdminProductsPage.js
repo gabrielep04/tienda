@@ -103,7 +103,7 @@ const AdminProductsPage = ({ onBack, user, onProductChange }) => {
     const updatedProducts = await getProducts();
     setProducts(updatedProducts);
     resetPopupState();
-    onProductChange();
+    onProductChange(updatedProducts);
   };
 
   const resetPopupState = () => {
@@ -132,6 +132,7 @@ const AdminProductsPage = ({ onBack, user, onProductChange }) => {
     await deleteProduct(id);
     const updatedProducts = await getProducts();
     setProducts(updatedProducts);
+    onProductChange(updatedProducts);
   };
 
   const truncateDescription = (description) => {

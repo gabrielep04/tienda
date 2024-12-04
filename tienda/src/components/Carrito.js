@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getCartItems, deleteCartItem, updateCartItem, getProducts } from '../utils/db.js';
 import './Carrito.css';
 
-const Carrito = ({ user, onBack, updateCart }) => {
+const Carrito = ({ user, onBack, updateCart, onCheckout }) => {
   const [cartItems, setCartItems] = useState([]);
   const [products, setProducts] = useState([]);
 
@@ -10,11 +10,79 @@ const Carrito = ({ user, onBack, updateCart }) => {
     const fetchCartItems = async () => {
       const items = await getCartItems();
       const allProducts = await getProducts();
-      setCartItems(items.filter((item) => item.userId === user.id)); // Filtra por usuario
+      const validProductIds = allProducts.map((product) => product.id);
+  
+      // Filtra ítems válidos basados en productos existentes
+      const validCartItems = items.filter((item) =>
+        validProductIds.includes(item.id)
+      );
+  
+      // Si se detectan cambios, sincroniza con la base de datos
+      if (validCartItems.length !== items.length) {
+        const invalidItems = items.filter(
+          (item) => !validProductIds.includes(item.id)
+        );
+        for (const invalidItem of invalidItems) {
+          await deleteCartItem(invalidItem.id);
+        }
+      }
+  
+      setCartItems(validCartItems.filter((item) => item.userId === user.id));
       setProducts(allProducts);
     };
+  
     fetchCartItems();
-  }, [user]);
+  }, [user]);  
+
+  useEffect(() => {
+  const syncCartWithInventory = async () => {
+    const updatedCartItems = cartItems.filter((item) => {
+      const productInDB = products.find((product) => product.id === item.id);
+      return productInDB && productInDB.quantity > 0; // Solo mantiene productos con stock
+    });
+
+    if (updatedCartItems.length !== cartItems.length) {
+      const removedItems = cartItems.filter(
+        (item) => !updatedCartItems.some((updated) => updated.id === item.id)
+      );
+      for (const removedItem of removedItems) {
+        await deleteCartItem(removedItem.id); // Elimina los ítems agotados
+      }
+      setCartItems(updatedCartItems); // Actualiza el estado del carrito
+      updateCart(updatedCartItems); // Sincroniza con el estado global
+    }
+        };
+        syncCartWithInventory();
+    }, [products, cartItems, updateCart]); // Añade updateCart como dependencia
+
+    useEffect(() => {
+        const syncCartWithInventory = async () => {
+          const updatedCartItems = cartItems.map((item) => {
+            const productInDB = products.find((product) => product.id === item.id);
+      
+            // Si el producto existe y hay discrepancia, actualizamos los datos del carrito
+            if (productInDB) {
+              return {
+                ...item,
+                name: productInDB.name,
+                price: productInDB.price,
+                image: productInDB.image,
+                quantity: Math.min(item.quantity, productInDB.quantity), // Ajustar cantidad si excede el stock
+              };
+            }
+            return item;
+          }).filter((item) => products.some((product) => product.id === item.id)); // Filtrar productos eliminados
+      
+          // Detecta si hubo cambios y sincroniza
+          if (JSON.stringify(updatedCartItems) !== JSON.stringify(cartItems)) {
+            setCartItems(updatedCartItems); // Actualizar estado del carrito
+            updateCart(updatedCartItems); // Actualizar estado global
+          }
+        };
+      
+        syncCartWithInventory();
+      }, [products, cartItems, updateCart]);
+      
 
   const handleRemove = async (id) => {
     const itemToReset = cartItems.find((item) => item.id === id);
@@ -37,6 +105,11 @@ const Carrito = ({ user, onBack, updateCart }) => {
   
     const product = await getProducts(); // Obtén los productos de la base de datos
     const productInDB = product.find((p) => p.id === id);
+
+    if (!productInDB) {
+        handleRemove(id); // Eliminar automáticamente si no existe
+        return;
+    }
   
     if (productInDB && newQuantity > productInDB.quantity) {
       alert(`No puedes añadir más de ${productInDB.quantity} unidades de este producto.`);
@@ -54,45 +127,63 @@ const Carrito = ({ user, onBack, updateCart }) => {
     await updateCartItem(updatedItem);
   };
 
+  const totalCompra = cartItems.reduce((total, item) => {
+    const productInDB = products.find((p) => p.id === item.id);
+    const itemTotal = productInDB ? item.quantity * productInDB.price : 0;
+    return total + itemTotal;
+  }, 0);
+
   return (
-    <div className="cart-page">
+<div className="cart-page">
       <h1>Tu Carrito</h1>
       <button onClick={onBack}>Volver</button>
       {cartItems.length === 0 ? (
         <p>No tienes productos en el carrito.</p>
       ) : (
-        <ul className="cart-list">
-         {cartItems.map((item) => {
-            const productInDB = products.find((p) => p.id === item.id); // Obtén el producto correspondiente
-            const maxQuantity = productInDB?.quantity || 1; // Establece el máximo basado en el inventario
+        <div>
+          <ul className="cart-list">
+            {cartItems.map((item) => {
+              const productInDB = products.find((p) => p.id === item.id); // Buscar el producto correctamente
+              const maxQuantity = productInDB?.quantity || 1; // Establecer máximo basado en el inventario
 
-            return (
-              <li key={item.id} className="cart-item">
-                <img
-                  src={item.image || '../public/default-placeholder.png'}
-                  alt={item.name}
-                />
-                <div>
-                  <h3>{item.name}</h3>
-                  <p>Precio: ${item.price}</p>
-                  <div className="quantity-controls">
-                    <label>Cantidad:</label>
-                    <input
-                      type="number"
-                      value={item.quantity}
-                      min="1"
-                      max={maxQuantity}
-                      onChange={(e) =>
-                        handleQuantityChange(item.id, parseInt(e.target.value))
-                      }
-                    />
+              // Calcular el total por producto
+              const productTotal = productInDB ? item.quantity * productInDB.price : 0;
+
+              return (
+                <li key={item.id} className="cart-item">
+                  <img
+                    src={item.image || '../public/default-placeholder.png'}
+                    alt={item.name}
+                  />
+                  <div>
+                    <h3>{item.name}</h3>
+                    <p>Precio: ${item.price}</p>
+                    <p>Total: ${productTotal.toFixed(2)}</p> {/* Muestra el total por producto */}
+                    <div className="quantity-controls">
+                      <label>Cantidad:</label>
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        min="1"
+                        max={maxQuantity}
+                        onChange={(e) =>
+                          handleQuantityChange(item.id, parseInt(e.target.value))
+                        }
+                      />
+                    </div>
                   </div>
-                </div>
-                <button onClick={() => handleRemove(item.id)}>Eliminar</button>
-              </li>
-            );
-          })}
-        </ul>
+                  <button onClick={() => handleRemove(item.id)}>Eliminar</button>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="cart-total">
+            <h3>Total de la compra: ${totalCompra.toFixed(2)}</h3> {/* Muestra el total de la compra */}
+          </div>
+          <button className="finalizar-compra" onClick={onCheckout}>
+            Finalizar Compra
+          </button>
+        </div>
       )}
     </div>
   );
