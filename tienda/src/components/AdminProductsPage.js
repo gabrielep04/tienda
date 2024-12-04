@@ -4,7 +4,7 @@ import { addProduct, getProducts, initDB, deleteProduct, updateProduct } from '.
 import AddProductPopup from './AddProductPopup';
 import { FaPlus } from 'react-icons/fa';
 
-const AdminProductsPage = ({ onBack, user }) => {
+const AdminProductsPage = ({ onBack, user, onProductChange }) => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -78,7 +78,7 @@ const AdminProductsPage = ({ onBack, user }) => {
   const handleAddOrUpdateProduct = async () => {
     const { name, price, quantity, description, proveedor, category, image } = newProduct;
 
-    if (!name || !price || !quantity || !description || !proveedor || !category || !image) {
+    if (!name || !price || !description || !proveedor || !category || !image) {
       alert('Todos los campos son obligatorios. Por favor, completa todos los campos.');
       return;
     }
@@ -103,6 +103,7 @@ const AdminProductsPage = ({ onBack, user }) => {
     const updatedProducts = await getProducts();
     setProducts(updatedProducts);
     resetPopupState();
+    onProductChange();
   };
 
   const resetPopupState = () => {

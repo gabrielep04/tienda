@@ -11,6 +11,9 @@ const ProductsPage = ({ user, onLogout }) => {
   const [view, setView] = useState('products'); // Estado para controlar la vista
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null); // Estado para el producto seleccionado
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [bestSellingProducts, setBestSellingProducts] = useState([]);
+
 
   // Estados para los filtros
   const [category, setCategory] = useState('');
@@ -21,9 +24,15 @@ const ProductsPage = ({ user, onLogout }) => {
     const fetchProducts = async () => {
       const dbProducts = await getProducts();
       setProducts(dbProducts);
+  
+      // Generar productos aleatorios solo una vez
+      const shuffled = [...dbProducts].sort(() => 0.5 - Math.random());
+      setRecommendedProducts(shuffled.slice(0, 4)); // 4 productos recomendados
+      setBestSellingProducts(shuffled.slice(4, 9)); // Otros 4 productos
     };
     fetchProducts();
   }, []);
+  
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -33,124 +42,224 @@ const ProductsPage = ({ user, onLogout }) => {
     setCartItems([...cartItems, product]);
   };
 
+  const precio = (precio) => {
+    if (precio > 1000000)
+      return "1.000.000";
+    else
+      return precio;
+  };
+
+  // Productos filtrados
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = category ? product.category === category : true;
     const matchesMinPrice = minPrice ? product.price >= parseFloat(minPrice) : true;
     const matchesMaxPrice = maxPrice ? product.price <= parseFloat(maxPrice) : true;
-    return (
-      matchesSearch &&
-      matchesCategory &&
-      matchesMinPrice &&
-      matchesMaxPrice
-    );
+    return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice;
   });
 
-  return view === 'products' ? (
-    <div className="products-page">
-      <header className="navbar">
-        <h1 className="logo">Shopsmart</h1>
+  const handleProductChange = () => {
+    // Llama a fetchProducts para actualizar los productos
+    const fetchProducts = async () => {
+      const dbProducts = await getProducts();
+      setProducts(dbProducts);
+    };
+    fetchProducts();
+  };
 
-        {/* Controles de filtros */}
-        <div className="filters-section">
-          <input
-            type="text"
-            className="filter-input search-bar"
-            placeholder="🔍 Buscar productos..."
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-          <select
-            className="filter-select"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="">Todas las categorías</option>
-            {[...new Set(products.map((p) => p.category))].map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-          <div className="price-filters">
-            <input
-              type="number"
-              className="filter-input"
-              placeholder="💵 Mínimo"
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-            />
-            <input
-              type="number"
-              className="filter-input"
-              placeholder="💵 Máximo"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="user-profile">
-          <span
-            onClick={() => setIsMenuOpen((prev) => !prev)}
-            className="user-name"
-          >
-            {user?.username}
-          </span>
-          {isMenuOpen && (
-            <div className="dropdown-menu">
-              {user?.role === 'admin' && (
-                <button onClick={() => setView('admin-products')}>Productos</button>
-              )}
-              <button onClick={onLogout}>Cerrar sesión</button>
-            </div>
-          )}
-        </div>
-        <div className="cart">
-          <span>Carrito ({cartItems.length})</span>
-        </div>
-      </header>
-      <main className="product-list">
-        {filteredProducts.map((product) => (
-          <div 
-            key={product.id} 
-            className="product-card" 
-            onClick={() => setSelectedProduct(product)} // Abrir popup al hacer clic
-          >
-            <img
-              src={product.image || '../public/default-placeholder.png'}
-              alt={product.name}
-              className="product-image"
-              onError={(e) => { e.target.src = '/default-placeholder.png'; }}
-            />
-            <h3>{product.name}</h3>
-            <p>Precio: ${product.price}</p>
-            <button
-              onClick={(e) => {
-                e.stopPropagation(); // Prevenir la apertura del popup al hacer clic en el botón
-                addToCart(product);
-              }}
-              disabled={product.quantity === 0}
-              className={product.quantity === 0 ? 'disabled-button' : 'add-to-cart-button'}
-            >
-              {product.quantity === 0 ? 'Agotado' : 'Agregar al carrito'}
-            </button>
-          </div>
-        ))}
-      </main>
-      {selectedProduct && (
-        <ProductPopup
-          product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-          onAddToCart={addToCart}
-        />
-      )}
-    </div>
-  ) : (
-    <AdminProductsPage
-      user={user}
-      onBack={() => setView('products')}
-    />
+// Función para verificar si hay filtros activos
+const areFiltersActive = () => {
+  return (
+    searchTerm.trim() !== '' || 
+    category !== '' || 
+    minPrice !== '' || 
+    maxPrice !== ''
   );
 };
+
+// Evaluar si ocultar las secciones basadas en los filtros
+const showRecommendations = !areFiltersActive();
+
+return view === 'products' ? (
+  <div className="products-page">
+    <header className="navbar">
+      <h1 className="logo">Shopsmart</h1>
+
+      {/* Controles de filtros */}
+      <div className="filters-section">
+        <input
+          type="text"
+          className="filter-input search-bar"
+          placeholder="🔍 Buscar productos..."
+          value={searchTerm}
+          onChange={handleSearch}
+        />
+        <select
+          className="filter-select"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="">Todas las categorías</option>
+          {[...new Set(products.map((p) => p.category))].map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+        <div className="price-filters">
+          <input
+            type="number"
+            className="filter-input"
+            placeholder="💵 Mínimo"
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+          />
+          <input
+            type="number"
+            className="filter-input"
+            placeholder="💵 Máximo"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="user-profile">
+        <span
+          onClick={() => setIsMenuOpen((prev) => !prev)}
+          className="user-name"
+        >
+          {user?.username}
+        </span>
+        {isMenuOpen && (
+          <div className="dropdown-menu">
+            {user?.role === 'admin' && (
+              <button onClick={() => setView('admin-products')}>Productos</button>
+            )}
+            <button onClick={onLogout}>Cerrar sesión</button>
+          </div>
+        )}
+      </div>
+      <div className="cart">
+        <span>Carrito ({cartItems.length})</span>
+      </div>
+    </header>
+
+    {/* Mostrar productos recomendados y más vendidos solo si no hay filtros */}
+    {showRecommendations && (
+      <>
+        {/* Zona de Productos Recomendados */}
+        <section className="recommended-products">
+          <h2>Recomendados para ti</h2>
+          <div className="product-list">
+            {recommendedProducts.map((product) => (
+              <div
+                key={product.id}
+                className="product-card"
+                onClick={() => setSelectedProduct(product)}
+              >
+                <img
+                  src={product.image || '../public/default-placeholder.png'}
+                  alt={product.name}
+                  className="product-image"
+                  onError={(e) => { e.target.src = '/default-placeholder.png'; }}
+                />
+                <h3>{product.name}</h3>
+                <p>Precio: ${precio(product.price)}</p>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart(product);
+                  }}
+                  disabled={product.quantity === 0}
+                  className={product.quantity === 0 ? 'disabled-button' : 'add-to-cart-button'}
+                >
+                  {product.quantity === 0 ? 'Agotado' : 'Agregar al carrito'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Zona de Productos Más Vendidos */}
+        <section className="best-selling-products">
+          <h2>Más Vendidos</h2>
+          <div className="product-list">
+            {bestSellingProducts.map((product) => (
+              <div
+                key={product.id}
+                className="product-card"
+                onClick={() => setSelectedProduct(product)}
+              >
+                <img
+                  src={product.image || '../public/default-placeholder.png'}
+                  alt={product.name}
+                  className="product-image"
+                  onError={(e) => { e.target.src = '/default-placeholder.png'; }}
+                />
+                <h3>{product.name}</h3>
+                <p>Precio: ${precio(product.price)}</p>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart(product);
+                  }}
+                  disabled={product.quantity === 0}
+                  className={product.quantity === 0 ? 'disabled-button' : 'add-to-cart-button'}
+                >
+                  {product.quantity === 0 ? 'Agotado' : 'Agregar al carrito'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      </>
+    )}
+
+    {/* Lista de todos los productos */}
+    <h2 className="productos-todos">Todo lo que tenemos para ti</h2>
+    <main className="product-list">
+      {filteredProducts.map((product) => (
+        <div
+          key={product.id}
+          className="product-card"
+          onClick={() => setSelectedProduct(product)}
+        >
+          <img
+            src={product.image || '../public/default-placeholder.png'}
+            alt={product.name}
+            className="product-image"
+            onError={(e) => { e.target.src = '/default-placeholder.png'; }}
+          />
+          <h3>{product.name}</h3>
+          <p>Precio: ${precio(product.price)}</p>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              addToCart(product);
+            }}
+            disabled={product.quantity === 0}
+            className={product.quantity === 0 ? 'disabled-button' : 'add-to-cart-button'}
+          >
+            {product.quantity === 0 ? 'Agotado' : 'Agregar al carrito'}
+          </button>
+        </div>
+      ))}
+    </main>
+    {selectedProduct && (
+      <ProductPopup
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        onAddToCart={addToCart}
+      />
+    )}
+  </div>
+) : (
+  <AdminProductsPage
+    user={user}
+    onBack={() => setView('products')}
+    onProductChange={handleProductChange}
+  />
+);
+}
 
 export default ProductsPage;
