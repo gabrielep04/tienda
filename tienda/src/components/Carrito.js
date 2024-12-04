@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCartItems, deleteCartItem, updateCartItem, getProducts } from '../utils/db.js';
+import { getCartItems, deleteCartItem, updateCartItem, getProducts, updateProduct } from '../utils/db.js';
 import './Carrito.css';
 
 const Carrito = ({ user, onBack, updateCart, onCheckout }) => {
@@ -133,60 +133,96 @@ const Carrito = ({ user, onBack, updateCart, onCheckout }) => {
     return total + itemTotal;
   }, 0);
 
+  const handleCheckout = async () => {
+    try {
+      // Recorremos los productos del carrito
+      for (const item of cartItems) {
+        const productInDB = products.find((product) => product.id === item.id);
+  
+        if (productInDB) {
+          const newQuantity = parseInt(productInDB.quantity) - parseInt(item.quantity);
+  
+          if (newQuantity < 0) {
+            alert(`Stock insuficiente para ${productInDB.name}.`);
+            return; // Finaliza si hay un error en el stock
+          }
+  
+          // Actualizamos la cantidad del producto en la base de datos
+          await updateProduct({ ...productInDB, quantity: newQuantity });
+        }
+      }
+  
+      // Limpiamos el carrito en la base de datos
+      for (const item of cartItems) {
+        await deleteCartItem(item.id);
+      }
+  
+      // Actualizamos el estado del carrito y notificamos al usuario
+      setCartItems([]);
+      updateCart([]);
+  
+      // Lógica adicional: regresar a la página de productos o mostrar confirmación
+      if (onCheckout) onCheckout();
+    } catch (error) {
+      console.error("Error durante el checkout:", error);
+      alert("Hubo un error al finalizar la compra. Por favor, inténtalo de nuevo.");
+    }
+  };  
+
   return (
-<div className="cart-page">
-      <h1>Tu Carrito</h1>
-      <button onClick={onBack}>Volver</button>
-      {cartItems.length === 0 ? (
-        <p>No tienes productos en el carrito.</p>
-      ) : (
-        <div>
-          <ul className="cart-list">
-            {cartItems.map((item) => {
-              const productInDB = products.find((p) => p.id === item.id); // Buscar el producto correctamente
-              const maxQuantity = productInDB?.quantity || 1; // Establecer máximo basado en el inventario
+    <div className="cart-page">
+        <h1>Tu Carrito</h1>
+        <button onClick={onBack}>Volver</button>
+        {cartItems.length === 0 ? (
+            <p>No tienes productos en el carrito.</p>
+        ) : (
+            <div>
+            <ul className="cart-list">
+                {cartItems.map((item) => {
+                const productInDB = products.find((p) => p.id === item.id); // Buscar el producto correctamente
+                const maxQuantity = productInDB?.quantity || 1; // Establecer máximo basado en el inventario
 
-              // Calcular el total por producto
-              const productTotal = productInDB ? item.quantity * productInDB.price : 0;
+                // Calcular el total por producto
+                const productTotal = productInDB ? item.quantity * productInDB.price : 0;
 
-              return (
-                <li key={item.id} className="cart-item">
-                  <img
-                    src={item.image || '../public/default-placeholder.png'}
-                    alt={item.name}
-                  />
-                  <div>
-                    <h3>{item.name}</h3>
-                    <p>Precio: ${item.price}</p>
-                    <p>Total: ${productTotal.toFixed(2)}</p> {/* Muestra el total por producto */}
-                    <div className="quantity-controls">
-                      <label>Cantidad:</label>
-                      <input
-                        type="number"
-                        value={item.quantity}
-                        min="1"
-                        max={maxQuantity}
-                        onChange={(e) =>
-                          handleQuantityChange(item.id, parseInt(e.target.value))
-                        }
-                      />
+                return (
+                    <li key={item.id} className="cart-item">
+                    <img
+                        src={item.image || '../public/default-placeholder.png'}
+                        alt={item.name}
+                    />
+                    <div>
+                        <h3>{item.name}</h3>
+                        <p>Precio: ${item.price}</p>
+                        <p>Total: ${productTotal.toFixed(2)}</p> {/* Muestra el total por producto */}
+                        <div className="quantity-controls">
+                        <label>Cantidad:</label>
+                        <input
+                            type="number"
+                            value={item.quantity}
+                            min="1"
+                            max={maxQuantity}
+                            onChange={(e) =>
+                            handleQuantityChange(item.id, parseInt(e.target.value))
+                            }
+                        />
+                        </div>
                     </div>
-                  </div>
-                  <button onClick={() => handleRemove(item.id)}>Eliminar</button>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="cart-total">
-            <h3>Total de la compra: ${totalCompra.toFixed(2)}</h3> {/* Muestra el total de la compra */}
-          </div>
-          <button className="finalizar-compra" onClick={onCheckout}>
-            Finalizar Compra
-          </button>
+                    <button onClick={() => handleRemove(item.id)}>Eliminar</button>
+                    </li>
+                );
+                })}
+            </ul>
+            <div className="cart-total">
+                <h3>Total de la compra: ${totalCompra.toFixed(2)}</h3> {/* Muestra el total de la compra */}
+            </div>
+            <button className="finalizar-compra" onClick={handleCheckout}>
+                Finalizar Compra
+            </button>
+            </div>
+        )}
         </div>
-      )}
-    </div>
-  );
-};
+    );
+    };
 
 export default Carrito;

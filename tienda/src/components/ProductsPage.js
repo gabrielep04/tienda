@@ -116,12 +116,18 @@ const areFiltersActive = () => {
 // Evaluar si ocultar las secciones basadas en los filtros
 const showRecommendations = !areFiltersActive();
 
-const handleCheckout = () => {
-  setView('checkout'); // Cambiar a la vista de compra
-};
-
 const handleBackToProducts = () => {
   setView('products');
+};
+
+const handleUpdateProducts = async () => {
+  const updatedProducts = await getProducts();
+  setProducts(updatedProducts); // Actualiza el estado de los productos
+      // Regenerar secciones de productos
+      const shuffled = [...updatedProducts].sort(() => 0.5 - Math.random());
+      setRecommendedProducts(shuffled.slice(0, 4)); // 4 productos recomendados
+      setBestSellingProducts(shuffled.slice(4, 8)); // Otros 4 productos
+  setView('checkout');
 };
 
 return view === 'products' ? (
@@ -300,7 +306,7 @@ return view === 'products' ? (
     )}
   </div>
 ) : view === 'cart' ? (
-  <Carrito user={user} onBack={() => setView('products')} updateCart={updateCart} updatedProducts={products} onProductChange={handleProductChange} onCheckout={handleCheckout}/>
+  <Carrito user={user} onBack={() => setView('products')} updateCart={updateCart} updatedProducts={products} onProductChange={handleProductChange} onCheckout={handleUpdateProducts}/>
 ) : view === 'checkout' ? (
   <Compra onBack={handleBackToProducts}/>
 ) : (
