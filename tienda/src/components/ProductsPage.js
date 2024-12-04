@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getProducts } from '../utils/db.js'; 
+import { getProducts, addToCartInDB, getCartItems, updateCartItem } from '../utils/db.js'; 
 import AdminProductsPage from './AdminProductsPage'; 
 import ProductPopup from './ProductPopup';
+import Carrito from './Carrito.js';
 import './ProductsPage.css';
 
 const ProductsPage = ({ user, onLogout }) => {
@@ -28,18 +29,51 @@ const ProductsPage = ({ user, onLogout }) => {
       // Generar productos aleatorios solo una vez
       const shuffled = [...dbProducts].sort(() => 0.5 - Math.random());
       setRecommendedProducts(shuffled.slice(0, 4)); // 4 productos recomendados
-      setBestSellingProducts(shuffled.slice(4, 9)); // Otros 4 productos
+      setBestSellingProducts(shuffled.slice(4, 8)); // Otros 4 productos
     };
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      const items = await getCartItems();
+      setCartItems(items.filter(item => item.userId === user.id)); // Filtra por usuario
+    };
+    fetchCartItems();
+  }, [user]);
   
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  const addToCart = (product) => {
-    setCartItems([...cartItems, product]);
+  const updateCart = (updatedItems) => {
+    setCartItems(updatedItems);
+  };  
+
+  const addToCart = async (product) => {
+    const existingItem = cartItems.find((item) => item.id === product.id && item.userId === user.id);
+  
+    if (existingItem) {
+      const newQuantity = existingItem.quantity + 1;
+      if (newQuantity > product.quantity) {
+        alert(`No puedes añadir más de ${product.quantity} unidades de este producto.`);
+        return;
+      }
+      const updatedItem = { ...existingItem, quantity: newQuantity };
+      await updateCartItem(updatedItem);
+      setCartItems((prev) =>
+        prev.map((item) => (item.id === product.id ? updatedItem : item))
+      );
+    } else {
+      if (product.quantity < 1) {
+        alert("Este producto no tiene stock disponible.");
+        return;
+      }
+      const newItem = { ...product, userId: user.id, quantity: 1 };
+      await addToCartInDB(newItem);
+      setCartItems((prev) => [...prev, newItem]);
+    }
   };
 
   const precio = (precio) => {
@@ -140,7 +174,9 @@ return view === 'products' ? (
         )}
       </div>
       <div className="cart">
-        <span>Carrito ({cartItems.length})</span>
+        <button onClick={() => setView('cart')}>
+          Carrito ({cartItems.length})
+        </button>
       </div>
     </header>
 
@@ -253,6 +289,8 @@ return view === 'products' ? (
       />
     )}
   </div>
+) : view === 'cart' ? (
+  <Carrito user={user} onBack={() => setView('products')} updateCart={updateCart}/>
 ) : (
   <AdminProductsPage
     user={user}

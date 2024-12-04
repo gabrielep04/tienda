@@ -17,6 +17,7 @@ products-page {
 
 .logo{
   color: #FFC220;
+  cursor: default;
 }
 
 .user-profile, .cart {
@@ -42,10 +43,9 @@ products-page {
 
 .product-card img {
   max-width: 100%;
-  height: auto;
+  height: 200px;
   border-radius: 10px;
   margin-bottom: 10px;
-  max-height: 200px;
   object-fit: cover;
 }
 
@@ -193,6 +193,7 @@ products-page {
   font-size: 22px;
   color: #FFC220;
   margin-left: 10px;
+  cursor: default;
 }
 
 .productos-todos {
@@ -201,4 +202,5 @@ products-page {
   font-size: 22px;
   color: #FFC220;
   margin-left: 10px;
+  cursor: default;
 }

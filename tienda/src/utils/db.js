@@ -54,7 +54,7 @@ export const updateProduct = async (product) => {
 
 
 // Funciones para el carrito
-export const addToCart = async (item) => {
+export const addToCartInDB = async (item) => {
   const db = await initDB();
   return db.add('cart', item);
 };
@@ -62,4 +62,16 @@ export const addToCart = async (item) => {
 export const getCartItems = async () => {
   const db = await initDB();
   return db.getAll('cart');
+};
+
+// Actualiza un producto en el carrito
+export const updateCartItem = async (item) => {
+  const db = await initDB();
+  return db.put('cart', item);
+};
+
+// Elimina un producto del carrito
+export const deleteCartItem = async (id) => {
+  const db = await initDB();
+  return db.delete('cart', id);
 };
