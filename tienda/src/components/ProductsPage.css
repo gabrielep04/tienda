@@ -204,3 +204,23 @@ products-page {
   margin-left: 10px;
   cursor: default;
 }
+
+.cart-button {
+  display: flex;
+  align-items: center;
+  background-color: #FFC220;
+  color: #005bb5;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.cart-button:hover {
+  background-color: #e0b41d;
+  transform: scale(1.05);
+}
+

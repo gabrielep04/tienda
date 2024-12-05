@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getProducts, addToCartInDB, getCartItems, updateCartItem } from '../utils/db.js'; 
 import AdminProductsPage from './AdminProductsPage'; 
+import { FaShoppingCart } from 'react-icons/fa';
 import ProductPopup from './ProductPopup';
 import Carrito from './Carrito.js';
 import Compra from './Compra.js';
@@ -190,8 +191,9 @@ return view === 'products' ? (
         )}
       </div>
       <div className="cart">
-        <button onClick={() => setView('cart')}>
-          Carrito ({cartItems.length})
+        <button className='cart-button' onClick={() => setView('cart')}>
+        <FaShoppingCart size={20} style={{ marginRight: '5px' }} />
+        ({cartItems.length})
         </button>
       </div>
     </header>

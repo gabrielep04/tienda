@@ -170,59 +170,61 @@ const Carrito = ({ user, onBack, updateCart, onCheckout }) => {
   };  
 
   return (
-    <div className="cart-page">
-        <h1>Tu Carrito</h1>
-        <button onClick={onBack}>Volver</button>
-        {cartItems.length === 0 ? (
+        <div className="cart-page">
+          <div className="cart-header">
+            <button onClick={onBack} className="back-button">Volver</button>
+            <h1 className='tucarrito'>Tu Carrito</h1>
+          </div>
+            {cartItems.length === 0 ? (
             <p>No tienes productos en el carrito.</p>
-        ) : (
-            <div>
-            <ul className="cart-list">
+            ) : (
+            <div className='lista-carrito'>
+              <ul className="cart-list">
                 {cartItems.map((item) => {
-                const productInDB = products.find((p) => p.id === item.id); // Buscar el producto correctamente
-                const maxQuantity = productInDB?.quantity || 1; // Establecer máximo basado en el inventario
-
-                // Calcular el total por producto
-                const productTotal = productInDB ? item.quantity * productInDB.price : 0;
-
-                return (
+                  const productInDB = products.find((p) => p.id === item.id);
+                  const maxQuantity = productInDB?.quantity || 1;
+                  const productTotal = productInDB ? item.quantity * productInDB.price : 0;
+    
+                  return (
                     <li key={item.id} className="cart-item">
-                    <img
+                      <img
                         src={item.image || '../public/default-placeholder.png'}
                         alt={item.name}
-                    />
-                    <div>
+                      />
+                      <div>
                         <h3>{item.name}</h3>
                         <p>Precio: ${item.price}</p>
-                        <p>Total: ${productTotal.toFixed(2)}</p> {/* Muestra el total por producto */}
+                        <p>Total: ${productTotal.toFixed(2)}</p>
                         <div className="quantity-controls">
-                        <label>Cantidad:</label>
-                        <input
+                          <label>Cantidad:</label>
+                          <input
                             type="number"
                             value={item.quantity}
                             min="1"
                             max={maxQuantity}
                             onChange={(e) =>
-                            handleQuantityChange(item.id, parseInt(e.target.value))
+                              handleQuantityChange(item.id, parseInt(e.target.value))
                             }
-                        />
+                          />
                         </div>
-                    </div>
-                    <button onClick={() => handleRemove(item.id)}>Eliminar</button>
+                      </div>
+                      <button onClick={() => handleRemove(item.id)}>Eliminar</button>
                     </li>
-                );
+                  );
                 })}
-            </ul>
-            <div className="cart-total">
-                <h3>Total de la compra: ${totalCompra.toFixed(2)}</h3> {/* Muestra el total de la compra */}
-            </div>
-            <button className="finalizar-compra" onClick={handleCheckout}>
+              </ul>
+              <div className='piecarrito'>
+              <div className="cart-total">
+                <h3>Total de la compra: ${totalCompra.toFixed(2)}</h3>
+              </div>
+              <button className="finalizar-compra" onClick={handleCheckout}>
                 Finalizar Compra
-            </button>
+              </button>
+                </div>
             </div>
-        )}
+            )}
         </div>
-    );
+      );
     };
 
 export default Carrito;

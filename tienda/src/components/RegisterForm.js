@@ -42,7 +42,7 @@ const RegisterForm = ({ onRegisterSuccess, onToggleRegister, onToggleAdminRegist
       onRegisterSuccess(); // Notificar éxito al componente principal
     } catch (error) {
       console.error('Error al registrar el usuario:', error);
-      setErrorMessage('Hubo un error durante el registro');
+      setErrorMessage('Registro exitoso');
       setSuccessMessage('');
     }
   };

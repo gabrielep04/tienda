@@ -1,6 +1,6 @@
 import { openDB } from 'idb';
 
-const DB_NAME = 'TiendaDB';
+const DB_NAME = 'Tienda1';
 const DB_VERSION = 1;
 
 // Inicializa la base de datos
