@@ -1,98 +1,114 @@
+/* Estilos para el contenedor principal */
 .login-form-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.9); 
-    transition: background-color 0.3s ease;
-  }
-  
-  .login-form {
-    background-color: #ffffff; 
-    padding: 30px; 
-    border-radius: 12px; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-    width: 350px;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  /* Estilos de los inputs */
-  .login-form input {
-    width: 320px;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    background-color: #f7f7f7;
-    color: #333;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-  }
-  
-  .login-form input:focus {
-    border-color: #005bb5; 
-    background-color: #fff;
-    outline: none;
-  }
-  
-  .login-form button {
-    width: 100%;
-    padding: 12px;
-    background-color: #005bb5; 
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .login-form button:hover {
-    background-color: #004494; 
-  }
-  
-  .error-message {
-    color: #d32f2f;
-    font-size: 14px;
-    margin-top: 10px;
-    text-align: center; 
-  }
-  
-  /* Modo oscuro */
-  .dark .login-form-container {
-    background-color: rgba(34, 34, 34, 0.9);
-    color: #eee;
-  }
-  
-  .dark .login-form {
-    background-color: #333; 
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  }
-  
-  .dark .login-form input {
-    background-color: #555; 
-    color: #eee; 
-    border: 1px solid #666; 
-  }
-  
-  .dark .login-form input:focus {
-    border-color: #80d8ff; 
-  }
-  
-  .dark .login-form button {
-    background-color: #80d8ff; 
-    color: #333; 
-  }
-  
-  .dark .login-form button:hover {
-    background-color: #4ec8ff; 
-  }
-  
-  .dark .error-message {
-    color: #ff5c5c; 
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f9f9f943;
+  text-align: center;
+}
+
+/* Contenedor del formulario */
+.login-form {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 90%;
+  border: 2px solid #005bb5;
+}
+
+/* Título de bienvenida */
+.login-form::before {
+  content: "¡Bienvenido a Shopsmart!";
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  color: #005bb5;
+  margin-bottom: 20px;
+}
+
+/* Estilo para etiquetas */
+.login-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+  text-align: left;
+}
+
+/* Inputs del formulario */
+.login-form input {
+  width: 90%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  margin-left: 0;
+}
+
+.login-form input:focus {
+  border-color: #005bb5;
+  outline: none;
+}
+
+/* Botón de inicio de sesión */
+.login-form button[type="submit"] {
+  background-color: #005bb5;
+  color: #FFC220;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  width: 100%;
+}
+
+.login-form button[type="submit"]:hover {
+  background-color: #004494;
+  transform: scale(1.05);
+}
+
+/* Mensaje de error */
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* Estilo para el texto debajo del botón */
+.login-form p {
+  font-size: 14px;
+  color: #555;
+}
+
+.login-form p button {
+  background: none;
+  border: none;
+  color: #005bb5;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.login-form p button:hover {
+  text-decoration: underline;
+}
+
+/* Efecto general para inputs y botones */
+.login-form input:hover, .login-form button:hover {
+  border-color: #005bb5;
+}
+
+.particles-background {
+  position: absolute; /* Asegura que esté colocado correctamente */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Lo coloca detrás de otros elementos */
+}
