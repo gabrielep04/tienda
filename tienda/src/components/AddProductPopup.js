@@ -14,7 +14,7 @@ const AddProductPopup = ({ newProduct, setNewProduct, onSaveProduct, onClose, is
               id="name"
               placeholder="Ejemplo: Camiseta"
               value={newProduct.name}
-              maxLength={25}
+              maxLength={50}
               onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
             />
           </div>
@@ -48,7 +48,7 @@ const AddProductPopup = ({ newProduct, setNewProduct, onSaveProduct, onClose, is
               id="description"
               placeholder="Ejemplo: Camiseta de algodón, disponible en varios colores"
               value={newProduct.description}
-              maxLength={300}
+              maxLength={350}
               onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
             />
           </div>
